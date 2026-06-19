@@ -133,14 +133,15 @@ class ApplicantController extends Controller
             'foto' => $applicant->photo_path,
         ];
 
-        abort_unless(isset($map[$document]) && Storage::disk('public')->exists($map[$document]), 404);
+        $disk = Storage::disk('public');
+        abort_unless(isset($map[$document]) && $disk->exists($map[$document]), 404);
 
-        return Storage::disk('public')->download($map[$document]);
+        return response()->download($disk->path($map[$document]));
     }
 
     public function export(): StreamedResponse
     {
-        $fileName = 'data-ppdb-semayu-'.now()->format('Ymd-His').'.csv';
+        $fileName = 'data-ppdb-semayu-' . now()->format('Ymd-His') . '.csv';
 
         return response()->streamDownload(function (): void {
             $output = fopen('php://output', 'w');
